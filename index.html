@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess Coordinate Trainer</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+      }
+      .container {
+        text-align: center;
+      }
+      .chessboard {
+        display: grid;
+        grid-template-columns: repeat(8, 50px);
+        grid-template-rows: repeat(8, 50px);
+        gap: 1px;
+        margin: 20px auto;
+      }
+      .square {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        position: relative;
+      }
+      .white {
+        background-color: #f0d9b5;
+      }
+      .black {
+        background-color: #b58863;
+      }
+      .highlight {
+        border: 3px solid red;
+      }
+      .coordinate {
+        position: absolute;
+        font-size: 10px;
+        color: #333;
+      }
+      .file {
+        bottom: 2px;
+        right: 2px;
+      }
+      .rank {
+        top: 2px;
+        left: 2px;
+      }
+      input,
+      button {
+        margin: 10px 0;
+        padding: 5px;
+      }
+      #feedback {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Chess Coordinate Trainer</h1>
+      <div id="score">Score: 0</div>
+      <div class="chessboard" id="chessboard"></div>
+      <input type="text" id="guess" placeholder="Enter coordinate (e.g., e4)" />
+      <button onclick="checkGuess()">Submit</button>
+      <div id="feedback"></div>
+    </div>
+
+    <script>
+      const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+      const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
+      let currentSquare = '';
+      let score = 0;
+
+      function createChessboard() {
+        const chessboard = document.getElementById('chessboard');
+        for (let i = 0; i < 8; i++) {
+          for (let j = 0; j < 8; j++) {
+            const square = document.createElement('div');
+            square.classList.add('square');
+            square.classList.add((i + j) % 2 === 0 ? 'white' : 'black');
+
+            if (i === 7) {
+              const file = document.createElement('span');
+              file.classList.add('coordinate', 'file');
+              file.textContent = files[j];
+              square.appendChild(file);
+            }
+            if (j === 0) {
+              const rank = document.createElement('span');
+              rank.classList.add('coordinate', 'rank');
+              rank.textContent = ranks[i];
+              square.appendChild(rank);
+            }
+
+            chessboard.appendChild(square);
+          }
+        }
+      }
+
+      function generateRandomSquare() {
+        const file = files[Math.floor(Math.random() * 8)];
+        const rank = ranks[Math.floor(Math.random() * 8)];
+        return file + rank;
+      }
+
+      function highlightSquare(square) {
+        const index = files.indexOf(square[0]) + (8 - parseInt(square[1])) * 8;
+        document
+          .querySelectorAll('.square')
+          .forEach((sq) => sq.classList.remove('highlight'));
+        document.querySelectorAll('.square')[index].classList.add('highlight');
+      }
+
+      function checkGuess() {
+        const guess = document.getElementById('guess').value.toLowerCase();
+        const feedback = document.getElementById('feedback');
+
+        if (guess === currentSquare) {
+          feedback.textContent = 'Correct!';
+          feedback.style.color = 'green';
+          score++;
+          document.getElementById('score').textContent = `Score: ${score}`;
+          newRound();
+        } else {
+          feedback.textContent = `Incorrect. The correct answer is ${currentSquare}.`;
+          feedback.style.color = 'red';
+        }
+
+        document.getElementById('guess').value = '';
+      }
+
+      function newRound() {
+        currentSquare = generateRandomSquare();
+        highlightSquare(currentSquare);
+      }
+
+      createChessboard();
+      newRound();
+    </script>
+  </body>
+</html>
